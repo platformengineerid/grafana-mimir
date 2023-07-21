@@ -1826,6 +1826,16 @@
         },
         {
           "kind": "field",
+          "name": "stream_label_values_from_ingesters",
+          "required": false,
+          "desc": "",
+          "fieldValue": null,
+          "fieldDefaultValue": false,
+          "fieldType": "boolean",
+          "fieldCategory": "experimental"
+        },
+        {
+          "kind": "field",
           "name": "max_concurrent",
           "required": false,
           "desc": "The number of workers running in each querier process. This setting limits the maximum number of concurrent queries in each querier.",
