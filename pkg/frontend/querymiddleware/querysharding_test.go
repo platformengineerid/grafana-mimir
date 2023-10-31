@@ -815,7 +815,7 @@ func TestQuerySharding_NonMonotonicHistogramBuckets(t *testing.T) {
 			require.NotEmpty(t, expectedPrometheusRes.Data.Result)
 			requireValidSamples(t, expectedPrometheusRes.Data.Result)
 
-			// Ensure the bucket monotonicity has not been fixed by PromQL engine.
+			// Ensure the precision errors and bucket monotonicity have not been fixed by PromQL engine.
 			require.Len(t, expectedPrometheusRes.GetWarnings(), 0)
 
 			for _, numShards := range []int{8, 16} {
@@ -839,9 +839,9 @@ func TestQuerySharding_NonMonotonicHistogramBuckets(t *testing.T) {
 					sort.Sort(byLabels(shardedPrometheusRes.Data.Result))
 					approximatelyEquals(t, expectedPrometheusRes, shardedPrometheusRes)
 
-					// Ensure the bucket monotonicity has been fixed by PromQL engine.
+					// Ensure the precision errors (not bucket monotonocity) have been fixed by PromQL engine.
 					require.Len(t, shardedPrometheusRes.GetWarnings(), 1)
-					assert.Contains(t, shardedPrometheusRes.Warnings, annotations.HistogramQuantileForcedMonotonicityInfo.Error())
+					assert.Contains(t, shardedPrometheusRes.Warnings, annotations.HistogramQuantileFixedPrecisionInfo.Error())
 				})
 			}
 		})
