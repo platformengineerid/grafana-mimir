@@ -12,6 +12,7 @@ import (
 	"io"
 	"math"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -698,6 +699,7 @@ func (d *Distributor) prePushHaDedupeMiddleware(next PushFunc) PushFunc {
 		if err != nil {
 			return err
 		}
+		d.logHisto(req, "PUSH HADEDUPE")
 
 		userID, err := tenant.TenantID(ctx)
 		if err != nil {
@@ -770,6 +772,7 @@ func (d *Distributor) prePushRelabelMiddleware(next PushFunc) PushFunc {
 		if err != nil {
 			return err
 		}
+		d.logHisto(req, "PUSH RELABEL")
 
 		userID, err := tenant.TenantID(ctx)
 		if err != nil {
@@ -839,6 +842,7 @@ func (d *Distributor) prePushValidationMiddleware(next PushFunc) PushFunc {
 		if err != nil {
 			return err
 		}
+		d.logHisto(req, "PUSH VALIDATION")
 
 		userID, err := tenant.TenantID(ctx)
 		if err != nil {
@@ -978,6 +982,7 @@ func (d *Distributor) metricsMiddleware(next PushFunc) PushFunc {
 		if err != nil {
 			return err
 		}
+		d.logHisto(req, "PUSH METRICS")
 
 		userID, err := tenant.TenantID(ctx)
 		if err != nil {
@@ -1236,6 +1241,19 @@ func (d *Distributor) handlePushError(ctx context.Context, pushErr error) error 
 	return toGRPCError(pushErr, serviceOverloadErrorEnabled)
 }
 
+func (d *Distributor) logHisto(req *mimirpb.WriteRequest, notes string) {
+	for _, ts := range req.Timeseries {
+		metric := mimirpb.FromLabelAdaptersToMetric(ts.Labels)
+		job, ok := metric["job"]
+		if !ok {
+			job = "i dunno"
+		}
+		if strings.Contains(string(job), "simple_server") && (strings.HasPrefix(metric.String(), "ping_request_count") || strings.HasPrefix(metric.String(), "random_histo") || strings.HasPrefix(metric.String(), "mixed")) {
+			level.Error(d.log).Log("msg", notes, metric.String())
+		}
+	}
+}
+
 // push takes a write request and distributes it to ingesters using the ring.
 // Strings in pushReq may be pointers into the gRPC buffer which will be reused, so must be copied if retained.
 // push does not check limits like ingestion rate and inflight requests.
@@ -1252,6 +1270,7 @@ func (d *Distributor) push(ctx context.Context, pushReq *Request) error {
 	if err != nil {
 		return err
 	}
+	d.logHisto(req, "PUSH ITSELF")
 
 	userID, err := tenant.TenantID(ctx)
 	if err != nil {
