@@ -21,6 +21,7 @@
   * `http.StatusBadRequest` (400) is replaced with `codes.FailedPrecondition`.
   * `http.StatusServiceUnavailable` (503) and `codes.Unknown` are replaced with `codes.Internal`.
 * [CHANGE] Upgrade Node.js to v20. #6540
+* [CHANGE] Distributor: Enable automatically generated OTel metric name suffixes. This behaviour can be disabled through `-distributor.otel-metric-suffixes-enabled`.
 * [FEATURE] Query-frontend: add experimental support for query blocking. Queries are blocked on a per-tenant basis and is configured via the limit `blocked_queries`. #5609
 * [FEATURE] Vault: Added support for new Vault authentication methods: `AppRole`, `Kubernetes`, `UserPass` and `Token`. #6143
 * [ENHANCEMENT] Ingester: exported summary `cortex_ingester_inflight_push_requests_summary` tracking total number of inflight requests in percentile buckets. #5845
