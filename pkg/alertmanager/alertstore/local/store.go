@@ -42,6 +42,21 @@ type Store struct {
 	cfg StoreConfig
 }
 
+func (f *Store) GetFullGrafanaState(ctx context.Context, user string) (alertspb.FullStateDesc, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f *Store) SetFullGrafanaState(ctx context.Context, user string, fs alertspb.FullStateDesc) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f *Store) DeleteFullGrafanaState(ctx context.Context, user string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 // NewStore returns a new file alert store.
 func NewStore(cfg StoreConfig) (*Store, error) {
 	return &Store{cfg}, nil
@@ -102,6 +117,19 @@ func (f *Store) SetAlertConfig(_ context.Context, _ alertspb.AlertConfigDesc) er
 
 // DeleteAlertConfig implements alertstore.AlertStore.
 func (f *Store) DeleteAlertConfig(_ context.Context, _ string) error {
+	return errReadOnly
+}
+
+func (f *Store) GetGrafanaAlertConfig(ctx context.Context, user string) (alertspb.GrafanaAlertConfigDesc, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f *Store) SetGrafanaAlertConfig(ctx context.Context, cfg alertspb.GrafanaAlertConfigDesc) error {
+	return errReadOnly
+}
+
+func (f *Store) DeleteGrafanaAlertConfig(ctx context.Context, user string) error {
 	return errReadOnly
 }
 

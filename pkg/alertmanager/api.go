@@ -30,6 +30,7 @@ import (
 )
 
 const (
+	errMarshallingJSON       = "error marshalling JSON Alertmanager Config"
 	errMarshallingYAML       = "error marshalling YAML Alertmanager config"
 	errValidatingConfig      = "error validating Alertmanager config"
 	errReadingConfiguration  = "unable to read the Alertmanager config"
