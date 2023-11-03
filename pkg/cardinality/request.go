@@ -138,6 +138,33 @@ func DecodeLabelValuesRequest(r *http.Request) (*LabelValuesRequest, error) {
 	return DecodeLabelValuesRequestFromValues(r.Form)
 }
 
+func DecodeActiveSeriesRequest(r *http.Request) ([][]*labels.Matcher, error) {
+	res, err := parseMatchersParam(r.Form["match[]"])
+	return res, err
+}
+
+func parseMatchersParam(matchers []string) ([][]*labels.Matcher, error) {
+	var matcherSets [][]*labels.Matcher
+	for _, s := range matchers {
+		matchers, err := parser.ParseMetricSelector(s)
+		if err != nil {
+			return nil, err
+		}
+		matcherSets = append(matcherSets, matchers)
+	}
+
+OUTER:
+	for _, ms := range matcherSets {
+		for _, lm := range ms {
+			if lm != nil && !lm.Matches("") {
+				continue OUTER
+			}
+		}
+		return nil, errors.New("match[] must contain at least one non-empty matcher")
+	}
+	return matcherSets, nil
+}
+
 // DecodeLabelValuesRequestFromValues is like DecodeLabelValuesRequest but takes url.Values in input.
 func DecodeLabelValuesRequestFromValues(values url.Values) (*LabelValuesRequest, error) {
 	var (
