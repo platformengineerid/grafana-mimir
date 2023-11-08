@@ -1239,9 +1239,13 @@ func (i *Ingester) pushSamplesToAppender(userID string, timeseries []mimirpb.Pre
 			// app.AppendExemplar currently doesn't create the series, it must
 			// already exist.  If it does not then drop.
 			if ref == 0 {
-				updateFirstPartial(nil, func() softError {
-					return newExemplarMissingSeriesError(model.Time(ts.Exemplars[0].TimestampMs), ts.Labels, ts.Exemplars[0].Labels)
-				})
+				if len(ts.Samples) == 0 || len(ts.Histograms) == 0 {
+					// surpress error to verify theory
+				} else {
+					updateFirstPartial(nil, func() softError {
+						return newExemplarMissingSeriesError(model.Time(ts.Exemplars[0].TimestampMs), ts.Labels, ts.Exemplars[0].Labels)
+					})
+				}
 				stats.failedExemplarsCount += len(ts.Exemplars)
 			} else { // Note that else is explicit, rather than a continue in the above if, in case of additional logic post exemplar processing.
 				for _, ex := range ts.Exemplars {
