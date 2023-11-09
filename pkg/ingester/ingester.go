@@ -3496,6 +3496,7 @@ func (i *Ingester) ownedSeriesLoop(ctx context.Context) error {
 	for ctx.Err() == nil {
 		select {
 		case <-ticker.C:
+			// TODO(pprus) -- use ring.WaitInstanceState instead
 			if i.lifecycler.GetState() != ring.ACTIVE {
 				level.Info(i.logger).Log("msg", "pprus -- lifecycler not ACTIVE")
 				break
